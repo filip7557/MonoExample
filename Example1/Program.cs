@@ -33,30 +33,30 @@ do
     }
 } while (optionId != 5);
 
-int SelectAnimalId()
+IAnimal? SelectAnimal()
 {
     Console.WriteLine("Enter ID of animal you want to select:");
     if (!int.TryParse(Console.ReadLine(), out int animalId))
     {
         Console.WriteLine("Wrong input.");
-        return -1;
+        return null;
     }
-    if (animals[animalId] == null)
+    if (animals.FirstOrDefault(a => a.Id == animalId) == null)
     {
         Console.WriteLine($"Animal with ID {animalId} does not exist.");
-        return -1;
+        return null;
     }
-    return animalId;
+    return animals.FirstOrDefault(a => a.Id == animalId);
 }
 
 void EditAnimal()
 {
     Console.WriteLine("Select animal you want to edit.");
-    var animalId = SelectAnimalId();
-    if (animalId == -1)
+    var animal = SelectAnimal();
+    if (animal == null)
         return;
 
-    Console.WriteLine(animals[animalId].ShowInfo());
+    Console.WriteLine(animal.ShowInfo());
     Console.WriteLine("Choose field you want to edit:\n1 - Name\n2 - Species\n3 - Age\n4 - Is adopted");
     var optionId = 0;
     int.TryParse(Console.ReadLine(), out optionId);
@@ -67,11 +67,11 @@ void EditAnimal()
             break;
         case 1:
             Console.WriteLine("Enter new name:");
-            animals[animalId].Name = Console.ReadLine();
+            animal.Name = Console.ReadLine();
             break;
         case 2:
             Console.WriteLine("Enter new species:");
-            animals[animalId].Species = new Species(Console.ReadLine() ?? "Default species");
+            animal.Species = new Species(Console.ReadLine() ?? "Default species");
             break;
         case 3:
             Console.WriteLine("Enter new age:");
@@ -81,7 +81,7 @@ void EditAnimal()
                 Console.WriteLine("Wrong input.");
                 return;
             }
-            animals[animalId].Age = age;
+            animal.Age = age;
             break;
         case 4:
             Console.WriteLine("Is Adopted:\n1 - Yes\n2 - No");
@@ -97,9 +97,9 @@ void EditAnimal()
                 return;
             }
             if (isAdopted == 1)
-                animals[animalId].IsAdopted = true;
+                animal.IsAdopted = true;
             else
-                animals[animalId].IsAdopted = false;
+                animal.IsAdopted = false;
             break;
     }
 }
@@ -107,10 +107,10 @@ void EditAnimal()
 void DeleteAnimal()
 {
     Console.WriteLine("Select animal you want to delete.");
-    var animalId = SelectAnimalId();
-    if (animalId == -1)
+    var animal = SelectAnimal();
+    if (animal == null)
         return;
-    animals.RemoveAt(animalId);
+    animals.Remove(animal);
 }
 
 void AddAnimal()
@@ -155,7 +155,7 @@ void AddAnimal()
     else
         animal.IsAdopted = false;
 
-    animal.Id = animals.Count;
+    animal.Id = animals.Count > 0 ? animals.Max(a => a.Id) + 1 : 1;
 
     animals.Add(animal);
 }
